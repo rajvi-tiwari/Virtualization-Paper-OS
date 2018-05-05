@@ -1,383 +1,327 @@
 \section{Introduction}
 
 
-As a new technology, Wireless Sensor Networks (WSNs) has a wide
-range of applications \cite{Culler-01, Bahl-02, Akyildiz-01}, including
-environment monitoring, smart buildings, medical care, industrial and
-military applications. Among them, a recent trend is to develop
-commercial sensor networks that require pervasive sensing of both
-environment and human beings, for example, assisted living
-\cite{Akyildiz-02, Harvard-01,CROSSBOW} and smart homes
-\cite{Harvard-01, Adya-01,CROSSBOW}.
+Understanding the performance of virtualized multi-tier applications is crucial for efficient cloud infrastructure management. Several enterprises, especially large ones that have already invested in their own infrastructure over the years are looking at setting up private clouds within their organizational boundaries 
+to reap the benefits of cloud computing technologies leveraging such investments. 
+
+Virtualization renders prominent accessibility for vital applications and streamlines application preparation and movements. CLOUD stands for Computing Location independent Online Utility which is a useable, on-Demand service that permits users access and occupy resources on internet devices connected to local, remote and other connection. Cloud computing is defined as an ''Internet based computing,'' where different utilities like storage, servers and applications are handled by a separate entity's computers and devices through the Internet [4]. 
+
 % quote
 \begin{quote}
-  ``For these applications, sensor devices are incorporated into human
-  cloths \cite{Natarajan-01, Zhou-06, Bahl-02, Adya-01} for monitoring
-  health related information like EKG readings, fall detection, and
-  voice recognition''.
+  ``It (CLOUD) provides the guest user with the elements needed to execute his request, while it gives the provider the ability to be housing different guests without risking the security and integrity of data.''[7]
 \end{quote}
-While collecting all these multimedia information
-\cite{Akyildiz-02} requires a high network throughput, off-the-shelf
-sensor devices only provide very limited bandwidth in a single
-channel: 19.2\,Kbps in MICA2 \cite{Bahl-02} and 250\,Kbps in MICAz.
-
-In this article, we propose MMSN, abbreviation for Multifrequency
-Media access control for wireless Sensor Networks. The main
-contributions of this work can be summarized as follows.
+The use of VM in Cloud Computing has become very popular nowadays. In fact, it is becoming more and more common in virtualization approaches due to its simplest basis of dividing a physical computer into many isolated machines, allowing the user (guest) to work on different environments (OS, applications ...) using the same devices. This virtualization comes however with some security threats, and the most evident question one can asks himself in this situation is ''Once one of the VM environments gets infected, will it impact all my data's security and privacy? Will this infection be able to threaten even my personal data that I did not share on the cloud?''. Thus, Virtualization comes with several challenges. In this paper, we will discuss the following:
 % itemize
 \begin{itemize}
-\item To the best of our knowledge, the MMSN protocol is the first
-multifrequency MAC protocol especially designed for WSNs, in which
-each device is equipped with a single radio transceiver and
-the MAC layer packet size is very small.
-\item Instead of using pairwise RTS/CTS frequency negotiation
-\cite{Adya-01, Culler-01, Tzamaloukas-01, Zhou-06},
-we propose lightweight frequency assignments, which are good choices
-for many deployed comparatively static WSNs.
-\item We develop new toggle transmission and snooping techniques to
-enable a single radio transceiver in a sensor device to achieve
-scalable performance, avoiding the nonscalable ``one
-control channel + multiple data channels'' design \cite{Natarajan-01}.
+\item The existing virtualization techniques, including process 
+virtualization, OS virtualization and system virtualization.
+\item Challenges in virtualizing different types of resources, 
+such as CPU, memory and I/O devices.
+\item Why virtualization is the enabling technology for the cloud ecosystem
 \end{itemize}
 
 % Head 1
-\section{MMSN Protocol}
+\section{VIRTUALIZATION TECHNIQUES}
 
 % Head 2
-\subsection{Frequency Assignment}
+\subsection{SERVER VIRTUALIZATION}
 
-We propose a suboptimal distribution to be used by each node, which is
-easy to compute and does not depend on the number of competing
-nodes. A natural candidate is an increasing geometric sequence, in
-which
-% Numbered Equation
-\begin{equation}
-\label{eqn:01}
-P(t)=\frac{b^{\frac{t+1}{T+1}}-b^{\frac{t}{T+1}}}{b-1},
-\end{equation}
-where $t=0,{\ldots}\,,T$, and $b$ is a number greater than $1$.
+Server virtualization is the most active segment of the virtualization industry featuring established companies such as VMware, Microsoft, and Citrix. With server virtualization one physical machine is divided many virtual servers. At the core of such virtualization is the concept of a hypervisor (virtual machine monitor). A hypervisor is a thin software layer that intercepts operating system calls to hardware. Hypervisors typically provide a virtualized CPU and memory for the guests running on top of them. The term was first used in conjunction with the IBM CP-370. Hypervisors are classified as one of two types:
 
-In our algorithm, we use the suboptimal approach for simplicity and
-generality. We need to make the distribution of the selected back-off
-time slice at each node conform to what is shown in
-Equation~\eqref{eqn:01}. It is implemented as follows: First, a random
-variable $\alpha$ with a uniform distribution within the interval $(0,
-1)$ is generated on each node, then time slice $i$ is selected
-according to the following equation:
-% Unnumbered Equation
-\[
-i=\lfloor(T+1)\log_b[\alpha(b-1)+1]\rfloor.
-\]
-It can be easily proven that the distribution of $i$ conforms to Equation
-(\ref{eqn:01}).
+Type 1 : This type of hypervisor is also known as native or bare metal. They run directly on the hardware with guest operating systems running on top of them. Examples include VMware ESX, Citrix XenServer and Hyper-V.
 
-So protocols \cite{Bahl-02, Culler-01,Zhou-06,Adya-01,
-Tzamaloukas-01, Akyildiz-01} that use RTS/CTS
-controls\footnote{RTS/CTS controls are required to be implemented by
-802.11-compliant devices. They can be used as an optional mechanism
-to avoid Hidden Terminal Problems in the 802.11 standard and
-protocols based on those similar to \cite{Akyildiz-01} and
-\cite{Adya-01}.} for frequency negotiation and reservation are not
-suitable for WSN applications, even though they exhibit good
-performance in general wireless ad-hoc
-networks.
+Type 2 : This type of hypervisor runs on top of an existing operating system with guests running at a third level above hardware. Examples include VMware Workstation and Parallels Desktop.
 
-% Head 3
-\subsubsection{Exclusive Frequency Assignment}
-
-
-In exclusive frequency assignment, nodes first exchange their IDs
-among two communication hops so that each node knows its two-hop
-neighbors' IDs. In the second broadcast, each node beacons all
-neighbors' IDs it has collected during the first broadcast period.
+Related to type 1 hypervisors is the concept of paravirtualization.
 
 % Head 4
-\paragraph{Eavesdropping}
+\paragraph{Paravirtualization}
 
-Even though the even selection scheme leads to even sharing of
-available frequencies among any two-hop neighborhood, it involves a
-number of two-hop broadcasts. To reduce the communication cost, we
-propose a lightweight eavesdropping scheme.
+Paravirtualization is a technique in which a software interface that is similar but not identical to the underlying hardware is presented. Operating systems must be ported to run on top of a paravirtualized hypervisor. Modified operating systems use the "hypercalls" supported by the paravirtualized hypervisor to interface directly with the hardware. The popular Xen project makes use of this type of virtualization. Starting with version 3.0 however Xen is also able to make use of the hardware assisted virtualization technologies of Intel (VT-x) and AMD (AMD-V). These extensions allow Xen to run unmodified operating systems such as Microsoft Windows.
 
-\subsection{Basic Notations}
+\subsection{OPERATING SYSTEM VIRTUALIZATION}
 
-As Algorithm~\ref{alg:one} states, for each frequency
-number, each node calculates a random number (${\textit{Rnd}}_{\alpha}$) for
-itself and a random number (${\textit{Rnd}}_{\beta}$) for each of its two-hop
-neighbors with the same pseudorandom number generator.
+Operating system virtualization provides application-transparent virtualization to users by decoupling applications from the OS. The OS virtualization technique offers granular control at the application level by facilitating the transparent migration of individual applications. The finer granularity migration offers greater flexibility, resulting in reduced overhead.
 
-% Algorithm
-\begin{algorithm}[t]
-\SetAlgoNoLine
-\KwIn{Node $\alpha$'s ID ($ID_{\alpha}$), and node $\alpha$'s
-neighbors' IDs within two communication hops.}
-\KwOut{The frequency number ($FreNum_{\alpha}$) node $\alpha$ gets assigned.}
-$index$ = 0; $FreNum_{\alpha}$ = -1\;
-\Repeat{$FreNum_{\alpha} > -1$}{
-        $Rnd_{\alpha}$ = Random($ID_{\alpha}$, $index$)\;
-        $Found$ = $TRUE$\;
-        \For{each node $\beta$ in $\alpha$'s two communication hops
-    }{
-      $Rnd_{\beta}$ = Random($ID_{\beta}$, $index$)\;
-      \If{($Rnd_{\alpha} < Rnd_{\beta}$) \text{or} ($Rnd_{\alpha}$ ==
-          $Rnd_{\beta}$ \text{and} $ID_{\alpha} < ID_{\beta}$)\;
-      }{
-        $Found$ = $FALSE$; break\;
-      }
-        }
-     \eIf{$Found$}{
-           $FreNum_{\alpha}$ = $index$\;
-         }{
-           $index$ ++\;
-     }
-      }
-\caption{Frequency Number Computation}
-\label{alg:one}
-\end{algorithm}
+OS virtualization can also be used to migrate critical applications to another running operating system instance. Patches and updates to the underlying operating system are done in a timely way, and have little or no impact on the availability of application services. The processes in the OS virtualized environment are isolated and their interactions with the underlying OS instance are monitored.
 
-
-Bus masters are divided into two disjoint sets, $\mathcal{M}_{RT}$
-and $\mathcal{M}_{NRT}$.
 % description
 \begin{description}
-\item[RT Masters]
-$\mathcal{M}_{RT}=\{ \vec{m}_{1},\dots,\vec{m}_{n}\}$ denotes the
-$n$ RT masters issuing real-time constrained requests. To model the
-current request issued by an $\vec{m}_{i}$ in $\mathcal{M}_{RT}$,
-three parameters---the recurrence time $(r_i)$, the service cycle
-$(c_i)$, and the relative deadline $(d_i)$---are used, with their
-relationships.
-\item[NRT Masters]
-$\mathcal{M}_{NRT}=\{ \vec{m}_{n+1},\dots,\vec{m}_{n+m}\}$ is a set
-of $m$ masters issuing nonreal-time constrained requests. In our
-model, each $\vec{m}_{j}$ in $\mathcal{M}_{NRT}$ needs only one
-parameter, the service cycle, to model the current request it
-issues.
+\item[Advantages of OS virtualization]
+\item OS virtualization usually imposes little or no overhead.
+
+OS Virtualization is capable of live migration.
+
+It can also use dynamic load balancing of containers between nodes and a cluster.
+
+The file level copy-on-write (CoW) mechanism is possible on OS virtualization which makes easier to back up files, more space-efficient and simpler to cache than the block-level copy-on-write schemes.
 \end{description}
 
-Here, a question may arise, since each node has a global ID. Why
-don't we just map nodes' IDs within two hops into a group of
-frequency numbers and assign those numbers to all nodes within two
-hops?
 
-\section{Simulator}
+\subsection{PROCESS VIRTUALIZATION}
 \label{sec:sim}
 
-If the model checker requests successors of a state which are not
-created yet, the state space uses the simulator to create the
-successors on-the-fly. To create successor states the simulator
-conducts the following steps.
+Process Virtualization technology ensures that a Task is executed exactly as if it is being executed on the computer that initiated the Job (Initiating Machine), regardless of the remote Agent's file system, installation base, and environment. It does not require any installations on remote agents, and does not require files to be copied from Initiating Machine. Process Virtualization ensures that files (including DLLs and others) required by the remote process are transferred automatically and transparently from Initiating Machine to Helper Machines.
+
+For process virtualization, the VM interfaces with the single process. The running application sees "virtual machine" as address space, registers and instruction set. Examples for this are:
 % enumerate
 \begin{enumerate}
-\item Load state into microcontroller model.
-\item Determine assignments needed for resolving nondeterminism.
-\item For each assignment.
+\item Multiprogramming.
+\item Emulation for binaries.
+\item High level language VMMs.
       \begin{enumerate}
-      \item either call interrupt handler or simulate effect of next instruction, or
-      \item evaluate truth values of atomic propositions.
+      \item JVM.
       \end{enumerate}
-\item Return resulting states.
 \end{enumerate}
-Figure~\ref{fig:one} shows a typical microcontroller C program that
-controls an automotive power window lift. The program is one of the
-programs used in the case study described in Section~\ref{sec:sim}.
-At first sight, the programs looks like an ANSI~C program. It
-contains function calls, assignments, if clauses, and while loops.
+Figure~\ref{fig:one} shows a basic outline of how virtualization is carried out.
+% * <rajvi23t@gmail.com> 2018-05-02T03:04:26.362Z:
+%
+% ^.
 % Figure
 \begin{figure}
-  \includegraphics{mouse}
-  \caption{Code before preprocessing.}
+  \includegraphics{snip}
+  \caption{Mechanism for Virtualization.[7]}
   \label{fig:one}
 \end{figure}
 
-\subsection{Problem Formulation}
 
-The objective of variable coalescence-based offset assignment is to find
-both the coalescence scheme and the MWPC on the coalesced graph. We start
-with a few definitions and lemmas for variable coalescence.
+\section{Virtualization Challenges}
+There are varied challenges associated with virtualizing resources such as CPU, memory and I/O devices. A brief overview of the same is provided below:
+\subsection{CPU Virtualization}
+\label{sec:vir}
+The trap-and-emulate approach used
+by VT hardware generates a lot of traps, and traps are very expensive on modern
+hardware because they ruin CPU caches, TLBs, and branch prediction tables internal
+to the CPU. In contrast, when sensitive instructions are replaced by calls to
+hypervisor procedures within the executing process, none of this context-switching
+overhead is incurred.  For this reason, some type 1 (and type 2)
+hypervisors do binary translation for performance reasons, even though the software
+will execute correctly without it.
 
-% Enunciations
-\begin{definition}[Coalesced Node (C-Node)]A C-node is a set of
-live ranges (webs) in the AG or IG that are coalesced. Nodes within the same
-C-node cannot interfere with each other on the IG. Before any coalescing is
-done, each live range is a C-node by itself.
-\end{definition}
+% description
+\begin{description}
+\item[Main challenges for CPU virtualization]
+\item Privileged Instructions : Handling architecture imposed instruction privilege levels.
 
-\begin{definition}[C-AG (Coalesced Access Graph)]The C-AG is the access
-graph after node coalescence, which is composed of all C-nodes and C-edges.
-\end{definition}
+ Performance Requirements : Holding down the cost of VMM activities.
+\end{description} 
 
-\begin{lemma}
-The C-MWPC problem is NP-complete.
-\end{lemma}
-\begin{proof} C-MWPC can be easily reduced to the MWPC problem assuming a
-coalescence graph without any edge or a fully connected interference graph.
-Therefore, each C-node is an uncoalesced live range after value separation
-and C-PC is equivalent to PC. A fully connected interference graph is made
-possible when all live ranges interfere with each other. Thus, the C-MWPC
-problem is NP-complete.
-\end{proof}
+\subsection{Memory Virtualization}
+\label{sec:vir}
+Memory Virtualization introduces a way to decouple memory from the processor, AND, from the server to provide a shared, distributed or networked function. Modern operating systems nearly all support virtual memory, which is basically a mapping of pages in the virtual address space onto pages of physical memory. This mapping is defined by (multilevel) page tables. Typically the mapping is set in motion by having the operating system set a control register in the CPU that points to the top-level page table. Virtualization greatly complicates memory management.
 
-\begin{lemma}[Lemma Subhead]The solution to the C-MWPC problem is no
-worse than the solution to the MWPC.
-\end{lemma}
-\begin{proof}
-Simply, any solution to the MWPC is also a solution to the
-C-MWPC. But some solutions to C-MWPC may not apply to the MWPC (if any
-coalescing were made).
-\end{proof}
+A big challenge is to minimize page faults. Page faults are always expensive, but especially so in virtualized environments, because they lead to so-called VM exits. A VM exit is a situation in which the
+hypervisor regains control. Let us consider what the CPU needs to do for such a VM exit. First, it records the cause of the VM exit, so the hypervisor knows what to do. It also records the address of the guest instruction that caused the exit. Next, a context switch is done, which includes saving all the registers. Then, it loads the
+hypervisors processor state. Then the hypervisor can start handling the page fault, which was expensive to begin with. It also needs to reverse these steps. The whole operation may take tens of thousands of cycles. This proves to be a significant and hindering overhead for the virtualization process. Thus, efficiently managing multiple memory spaces and avoiding page faults is important.
 
-\section{Performance Evaluation}
+% description
+\begin{description}
+\item[Main challenges for Memory virtualization]
+\item Memory Management : Managing multiple address spaces efficiently.
 
-During all the experiments, the Geographic Forwarding (GF) by Akyildiz
-et al.~\shortcite{Akyildiz-01} routing protocol is used. GF exploits
-geographic information of nodes and conducts local data-forwarding to
-achieve end-to-end routing. Our simulation is configured according to
-the settings in Table~\ref{tab:one}. Each run lasts for 2 minutes and
-repeated 100 times. For each data value we present in the results, we
-also give its 90\% confidence interval.
+ Reducing Page Faults/VM exits : Costly operations.
+\end{description} 
+ 
+\subsection{I/O Virtualization}
+\label{sec:vir}
+In many systems, a nontrivial performance penalty is associated with indirection. The same can be true for virtualized I/O, since I/O operations must conceptually traverse two separate I/O stacks: one in the guest managing the virtual hardware and one in the hypervisor managing the physical hardware. The longer I/O path affects both latency and throughput, and imposes additional CPU load. Indeed, I/O-intensive workloads on some early virtualization systems suffered a virtualization penalty larger than a factor of two. Since then, further research, optimizations, and hardware acceleration have reduced this penalty into the noise for an impressive set of demanding production workloads. Somewhat counterintuitively, virtualized systems have even outperformed native systems on the same physical hardware, overcoming native scaling limitations by instead running several smaller VM instances in a scale-out configuration.
 
+The majority of server virtualization deployments are configured for high availability and, as a result, are heavily reliant on shared networked storage. As the number of VMs on a physical host increases, shared storage can quickly lead to storage I/O bottlenecks.
+
+% description
+\begin{description}
+\item[Main challenges for I/O virtualization]
+\item  Handling I/O requests from multiple operating
+systems. 
+
+ DMAs: Absolute memory addresses used
+ 
+ Bottlenecks associated with use
+\end{description} 
 % Table
 \begin{table}%
-\caption{Simulation Configuration}
+\caption{Challenges to Virtualization}
 \label{tab:one}
 \begin{minipage}{\columnwidth}
 \begin{center}
 \begin{tabular}{ll}
   \toprule
-  TERRAIN\footnote{This is a table footnote. This is a
-    table footnote. This is a table footnote.}   & (200m$\times$200m) Square\\
-  Node Number     & 289\\
-  Node Placement  & Uniform\\
-  Application     & Many-to-Many/Gossip CBR Streams\\
-  Payload Size    & 32 bytes\\
-  Routing Layer   & GF\\
-  MAC Layer       & CSMA/MMSN\\
-  Radio Layer     & RADIO-ACCNOISE\\
-  Radio Bandwidth & 250Kbps\\
-  Radio Range     & 20m--45m\\
+  CPU   & \\
+  1     & Handling privilege levels\\
+  2  & Minimizing cost of VMM activities\\
+  Memory     & \\
+  1    & Multiple address spaces or page tables\\
+  2   & Reducing VM exits\\
+  I/O       & \\
+  1     & Requests from multiple OSs\\
+  2 & Use of absolute memory addresses\\
+  3     & bottlenecks due to sharing\\
   \bottomrule
 \end{tabular}
 \end{center}
 \bigskip\centering
-\footnotesize\emph{Source:} This is a table
- sourcenote. This is a table sourcenote. This is a table
- sourcenote.
+\footnotesize\emph{Source:} Self compiled.
 
  \emph{Note:} This is a table footnote.
 \end{minipage}
 \end{table}%
 
 
-\section{Conclusions}
+\section{CLOUD ECOSYSTEM AND VIRTUALIZATION}
 
-In this article, we develop the first multifrequency MAC protocol for
-WSN applications in which each device adopts a
-single radio transceiver. The different MAC design requirements for
-WSNs and general wireless ad-hoc networks are
-compared, and a complete WSN multifrequency MAC design (MMSN) is
-put forth. During the MMSN design, we analyze and evaluate different
-choices for frequency assignments and also discuss the nonuniform
-back-off algorithms for the slotted media access design.
+Cloud computing is becoming popular as virtualization power, distributed computing with server cluster
+and increase in the availability of broadband internet assessing is increasing.
+The IT world is looking forward for the services provided by cloud computing thus boosting up the
+development of cloud computing.
+NIST [8] has defined cloud as ''Cloud computing is a model for enabling ubiquitous, convenient, on demand
+network access to a shared pool of configurable computing resources (e.g., networks, servers, storage,
+applications, and services) that can be rapidly provisioned and released with minimal management effort or
+service provider interaction''. 
 
-% Start of "Sample References" section
+\subsection{DEFINITION AND SCOPE}
 
-\section{Typical References in New ACM Reference Format}
-A paginated journal article \cite{Abril07}, an enumerated
-journal article \cite{Cohen07}, a reference to an entire issue \cite{JCohen96},
-a monograph (whole book) \cite{Kosiur01}, a monograph/whole book in a series (see 2a in spec. document)
-\cite{Harel79}, a divisible-book such as an anthology or compilation \cite{Editor00}
-followed by the same example, however we only output the series if the volume number is given
-\cite{Editor00a} (so Editor00a's series should NOT be present since it has no vol. no.),
-a chapter in a divisible book \cite{Spector90}, a chapter in a divisible book
-in a series \cite{Douglass98}, a multi-volume work as book \cite{Knuth97},
-an article in a proceedings (of a conference, symposium, workshop for example)
-(paginated proceedings article) \cite{Andler79}, a proceedings article
-with all possible elements \cite{Smith10}, an example of an enumerated
-proceedings article \cite{VanGundy07},
-an informally published work \cite{Harel78}, a doctoral dissertation \cite{Clarkson85},
-a master's thesis: \cite{anisi03}, an online document / world wide web
-resource \cite{Thornburg01, Ablamowicz07, Poker06}, a video game (Case 1) \cite{Obama08} and (Case 2) \cite{Novak03}
-and \cite{Lee05} and (Case 3) a patent \cite{JoeScientist001},
-work accepted for publication \cite{rous08}, 'YYYYb'-test for prolific author
-\cite{SaeediMEJ10} and \cite{SaeediJETC10}. Other cites might contain
-'duplicate' DOI and URLs (some SIAM articles) \cite{Kirschmer:2010:AEI:1958016.1958018}.
-Boris / Barbara Beeton: multi-volume works as books
-\cite{MR781536} and \cite{MR781537}.
+% Head 4
+\paragraph{Definition: }
 
-A couple of citations with DOIs: \cite{2004:ITE:1009386.1010128,
-  Kirschmer:2010:AEI:1958016.1958018}.
+Cloud computing is the outcome of grid computing, utility computing and automatic computing.
+Cloud is a parallel and distributed computing system which consists a set of inter connected and virtualized
+computers which gives one or more unified computing resources based on the requirements between service
+providers and service consumers[3].
 
-Online citations: \cite{TUGInstmem, Thornburg01, CTANacmart}.
+Cloud computing is on demand pay-as-use i.e billing is done based on the usage of the customer which
+downs the operational and capital cost. Users can access applications which are present outside the working site
+which can access remote applications through internet connection devices. By this, computer resources can be
+efficiently used and consume less computing power and resources are shared cooperatively.
+Cloud computing services are first offered by Amazon, Google, Microsoft and now many are existing.
+These services are used by software industries, government sectors, and health care sectors and in many more
+fields.
+The main power of cloud computing lies in the way data is stored, how it is transmitted and accessed. A
+virtualized platform with management capabilities like availability, automated load balancing and fault
+tolerance reduces infrastructure cost and maintenance cost.
+
+\subsection{ELEMENTS OF CLOUD}
+Clients: Users like computers, laptops, tablets computers mobile phones or PDA's.
+
+Data Centers: These are a collection of servers where the application is hosted. Virtualization is done where
+multiple instances of virtual servers are created.
+
+Distributed Server: Servers which reside non locally which are geographically far.
+
+There are three typed of cloud services:
+\begin{description}
+\item[Saas]
+\item 'Software as a Service' is the model in which an application is hosted as a service to customers who access through internet. Users can access their application anywhere if they are connected to internet. Some of the applications are CRM (customer Resource Managing), accounting, web content managing.
+\end{description}
+\begin{description}
+\item[PaaS]
+\item  Platform as a Service. This is another application delivery model which provides resources required to
+build application and services completely from internet without purchasing.Developers can design, develop, test and deploy and host applications. More services are like team collaboration, web service integration, DB integration.
+\end{description}
+\begin{description}
+\item[IaaS]
+\item  Infrastructure as a service. This provides the required hardware so that users can put anything they
+required. IaaS allows renting of resources like server space, cpu cycles, network equipments, memory and
+storage space.
+\end{description}
+
+\subsection{VIRTUALIZATION IN CLOUD COMPUTING}
+Virtualization technology makes cloud computing environment easily to manage the resources. It abstracts and
+isolates the underlying hardware, and networking resources in a single hosting environment. It increases the security of cloud computing by protecting both the integrity on guest virtual machine and
+cloud components virtualized machines can be scaled up or down on demand and can provide reliability. It
+provides resource sharing, high utilization of pooled resources, rapid provisioning, workload isolation.
+The recent trends in virtualization are consolidation of data centers thus reducing the managing cost.
+
+Apart of its benefits it has some drawbacks like managing virtual resources is critical and migrating services of these resources are difficult in achieving high availability.
+If one server fail VM will be restarted on the other virtualized server in resource pool restoring the required
+services with minimum service interruption.
+Virtual resources are critical for managing and data monitoring. Running applications with high utilization and
+availability is a challenging issue. 
+
+\paragraph{Security Perspective:} Hypervisor controls all the guest systems. As the operating system number increases managing is difficult these leads to security issues. If a hacker gets control over the hypervisor he can control the guest systems by knowing the behavior of the system which causes data processing damage. Advanced protection system is to be developed to monitor the activities of the guest Virtual machine[3].
+Data loss, data security and inconvenience to access the data are
+some of the major problems that users face but with the use of cloud
+computing these problems can be resolved easily. Some of the major
+future aspects are:
+
+a. Migration time will become negligible
+
+b. Data is secured and data loss is minimized
+
+c. One user-many devices relationship
+
+\section{CONCLUSION}
+We have discussed the nuances of virtualization and have developed its relationship with the cloud. To have physical and virtual controls in the cloud environment one must protect data by implementing strong
+encrypting techniques using secure connections and applying data loss prevention policies[5].
+Access control policies are to be established and client identities are to be checked.
+Datacenter platforms, infrastructure and client devices are to be secured by trusted computer policies.
+Enable secure migration from private cloud environment to public cloud providers.
+
+Virtualization technology offers important utilities which make it an indispensable tool that can be used in a large number of applications. These are not limited to server consolidation, application sandboxing, access to  different types of hardware and operating systems, debugging, etc. There are different techniques that Virtual Machine ware is pursuing to make performance of virtualization better over time. The idea of cloud computing is getting more preferred and it has a long way to be developed. Cloud computing provides lots of benefits to the users and makes resource management much easier for the user. We discussed the challenges associated with virtualization as well as the cloud development cycle. The scope has also been presented. This survey paper proves that much more in-depth research can, and hence should, be pursued in these designated areas.
 
 % Appendix
 \appendix
-\section{Switching Times}
-
-In this appendix, we measure the channel switching time of Micaz
-\cite{CROSSBOW} sensor devices.  In our experiments, one mote
-alternatingly switches between Channels~11 and~12. Every time after
-the node switches to a channel, it sends out a packet immediately and
-then changes to a new channel as soon as the transmission is finished.
-We measure the number of packets the test mote can send in 10 seconds,
-denoted as $N_{1}$. In contrast, we also measure the same value of the
-test mote without switching channels, denoted as $N_{2}$. We calculate
-the channel-switching time $s$ as
-\begin{displaymath}%
-s=\frac{10}{N_{1}}-\frac{10}{N_{2}}.
-\end{displaymath}%
-By repeating the experiments 100 times, we get the average
-channel-switching time of Micaz motes: 24.3\,$\mu$s.
-
-\section{Supplementary Materials}
-
-
-\begin{printonly}
-  See the supplementary materials in the online version
-\end{printonly}
-
-\begin{screenonly}
-\subsection{This is an Example of Appendix Subsection Head}
-
-Channel-switching time is measured as the time length it takes for
-motes to successfully switch from one channel to another. This
-parameter impacts the maximum network throughput, because motes
-cannot receive or send any packet during this period of time, and it
-also affects the efficiency of toggle snooping in MMSN, where motes
-need to sense through channels rapidly.
-
-By repeating experiments 100 times, we get the average
-channel-switching time of Micaz motes: 24.3 $\mu$s. We then conduct
-the same experiments with different Micaz motes, as well as
-experiments with the transmitter switching from Channel 11 to other
-channels. In both scenarios, the channel-switching time does not have
-obvious changes. (In our experiments, all values are in the range of
-23.6 $\mu$s to 24.9 $\mu$s.)
-
-\subsection{Appendix Subsection Head}
-
-The primary consumer of energy in WSNs is idle listening. The key to
-reduce idle listening is executing low duty-cycle on nodes. Two
-primary approaches are considered in controlling duty-cycles in the
-MAC layer.
-
-\end{screenonly}
 
 \begin{acks}
 
-The authors would like to thank Dr. Maura Turolla of Telecom
-Italia for providing specifications about the application scenario.
+The author would like to thank Dr. Jia Rao at The University of Texas at Arlington's Computer Science and Engineering Department for providing specifications and guidance regarding the topic. His assistance in routing the author towards similar research papers and books have helped in the realization of this paper. 
 
-The work is supported by the \grantsponsor{GS501100001809}{National
-  Natural Science Foundation of
-  China}{http://dx.doi.org/10.13039/501100001809} under Grant
-No.:~\grantnum{GS501100001809}{61273304\_a}
-and~\grantnum[http://www.nnsf.cn/youngscientists]{GS501100001809}{Young
-  Scientists' Support Program}.
 
 
 \end{acks}
 
 % Bibliography
 \bibliographystyle{ACM-Reference-Format}
-\bibliography{sample-bibliography}
+\bibliography{REFERENCES}
+
+[1] AMD. AMD64 Virtualization Codenamed ''Pacifica'' Technology:
+Secure Virtual Machine Architecture Reference Manual, May 2005.
+
+[2] AMSDEN, Z., ARAI, D., HECHT, D., HOLLER, A., AND SUBRAHMANYAM,
+P. VMI: An interface for paravirtualization. Ottawa Linux
+Symposium (2006).
+
+[3] DEITEL, H. M. An introduction to operating systems (2nd ed.).
+Addison-Wesley Longman Publishing Co., Inc., Boston, MA, USA,
+1990.
+
+[4] HENNESSY, J. L., AND PATTERSON, D. A. Computer architecture:
+a quantitative approach. Morgan Kaufmann Publishers Inc., San
+Francisco, CA, USA, 2002.
+
+[5] INTEL CORPORATION. Intel
+R Virtualization Technology Specification
+for the IA-32 Intel
+R Architecture, April 2005
+
+[6] POPEK, G. J., AND GOLDBERG, R. P. Formal requirements for
+virtualizable third generation architectures. Commun. ACM 17, 7
+(1974), 412-421.
+
+[7] SILBERSCHATZ, A., AND PETERSON, J. L., Eds. Operating systems
+concepts. Addison-Wesley Longman Publishing Co., Inc., Boston,
+MA, USA, 1988.
+
+[8] SMITH, J. E., AND NAIR, R. Virtual machines: versatile platforms for
+systems and processes. Morgan Kaufmann Publishers, San Francisco,
+CA, USA, 2005.
+
+[9] KARGER, P. A., ZURKO, M. E., BONIN, D. W., MASON, A. H.,
+AND KAHN, C. E. A vmm security kernel for the vax architecture. In
+IEEE Symposium on Security and Privacy (1990), pp. 2-19.
+
+[10] LEVASSEUR, J., UHLIG, V., CHAPMAN, M., CHUBB, P., LESLIE,
+B., AND HEISER, G. Pre-virtualization: Slashing the cost of
+virtualization. Technical Report 2005-30, Fakultat fur Informatik,
+Universitat Karlsruhe (TH), Nov. 2005.
+
+[11] MCGHAN, H., AND O'CONNOR, M. Picojava: A direct execution
+engine for java bytecode. Computer 31, 10 (1998), 22-30.
+
+[12] NEIGER, G., SANTONI, A., LEUNG, F., RODGERS, D., AND UHLIG,
+R. Intel virtualization technology: Hardware support for efficient
+processor virtualization. Intel Technology Journal 10, 3 (2006).
+
+[13] OSISEK, D. L., JACKSON, K. M., AND GUM, P. H. ESA/390
+interpretive-execution architecture, foundation for VM/ESA. IBM
+Systems Journal 30, 1 (1991), 34-51.
+
